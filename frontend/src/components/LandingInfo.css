@@ -1,0 +1,209 @@
+.landing-info-container {
+  margin-top: 80px;
+  padding: 60px 0;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  color: #333;
+  transition: all 0.5s ease;
+}
+
+/* Theme variations for LandingInfo */
+.landing-info-container.genesis-theme {
+  color: #f0f0f0;
+  border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+.landing-info-container.genesis-theme .section-title {
+  color: #ffffff;
+}
+
+.landing-info-container.genesis-theme .section-subtitle {
+  color: #bbbbbb;
+}
+
+.landing-info-container.genesis-theme .info-card {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.landing-info-container.genesis-theme .info-icon {
+  color: #ffd700;
+}
+
+.landing-info-container.genesis-theme .icon-wrapper {
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.landing-info-container.genesis-theme .card-title {
+  color: #ffffff;
+}
+
+.landing-info-container.genesis-theme .card-desc {
+  color: #dddddd;
+}
+
+.landing-info-container.genesis-theme .step-circle {
+  background: rgba(255, 215, 0, 0.1);
+  border: 2px solid #ffd700;
+  color: #ffd700;
+}
+
+.landing-info-container.genesis-theme .step-title {
+  color: #ffffff;
+}
+
+.landing-info-container.genesis-theme .step-desc {
+  color: #cccccc;
+}
+
+.landing-info-container.genesis-theme .flow-arrow {
+  color: #ffd700;
+}
+
+
+/* Common Styles */
+.info-section {
+  max-width: 1000px;
+  margin: 0 auto 80px;
+  padding: 0 20px;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.section-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #1a1a1a;
+}
+
+.section-subtitle {
+  font-size: 18px;
+  color: #666;
+  font-weight: 400;
+}
+
+/* Grid Layout for Cards */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+.info-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+}
+
+.info-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+}
+
+.icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(25, 118, 210, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.info-icon {
+  color: #1976d2;
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #222;
+}
+
+.card-desc {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #555;
+}
+
+/* Process Flow Layout */
+.process-flow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.flow-step {
+  flex: 1;
+  min-width: 200px;
+  text-align: center;
+  padding: 20px;
+}
+
+.step-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #1976d2;
+  color: #1976d2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  box-shadow: 0 5px 15px rgba(25, 118, 210, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.flow-step:hover .step-circle {
+  transform: scale(1.1);
+}
+
+.step-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #222;
+}
+
+.step-desc {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.flow-arrow-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+}
+
+.flow-arrow {
+  color: #ccc;
+}
+
+@media (max-width: 768px) {
+  .process-flow {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .flow-arrow-container {
+    height: 60px;
+    transform: rotate(90deg);
+  }
+}

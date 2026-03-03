@@ -20,6 +20,7 @@ function FileGroupManager({ files, onClearFiles, selectedTheme }) {
   const [genesisDay, setGenesisDay] = useState(1);
   const [totalProgress, setTotalProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   /**
    * 내용: 파일명에서 확장자를 제거한 순수 이름을 반환합니다.
@@ -100,6 +101,7 @@ function FileGroupManager({ files, onClearFiles, selectedTheme }) {
     setError(null);
     setGenesisDay(1);
     setTotalProgress(0);
+    setUploadProgress(0);
     setStatusMessage("연결 준비 중...");
 
     let eventSource = null;
@@ -139,7 +141,14 @@ function FileGroupManager({ files, onClearFiles, selectedTheme }) {
       });
 
       // 연결 확립 후 백엔드에 변환 POST 요청
-      const response = await convertFiles(groups, taskId);
+      const response = await convertFiles(groups, taskId, (percent) => {
+        setUploadProgress(percent);
+        if (percent < 100) {
+          setStatusMessage(`파일 업로드 중... ${percent}%`);
+        } else {
+          setStatusMessage("업로드 완료! 서버에서 변환 중...");
+        }
+      });
       
       // Blob 응답을 파일로 변환하여 다운로드
       const blob = new Blob([response.data], { type: response.headers['content-type'] });
@@ -173,17 +182,26 @@ function FileGroupManager({ files, onClearFiles, selectedTheme }) {
       
       let errorMessage = '문서 변환 중 오류가 발생했습니다.';
       
-      // Blob 응답에서 에러 메시지 추출 (응답이 JSON인 경우)
+      // Blob 응답에서 에러 메시지 추출 (응답이 JSON인 경우) 고도화
       if (err.response && err.response.data instanceof Blob) {
         try {
           const text = await err.response.data.text();
-          const errorData = JSON.parse(text);
-          errorMessage = errorData.error || errorMessage;
+          // JSON 형식이 아닐 경우를 대비한 방어적 파싱
+          if (text.trim().startsWith('{')) {
+            const errorData = JSON.parse(text);
+            errorMessage = errorData.error || errorData.detail || errorMessage;
+          } else {
+            errorMessage = text || errorMessage;
+          }
         } catch (parseErr) {
           console.error('에러 데이터 파싱 실패:', parseErr);
         }
-      } else if (err.response && err.response.data && err.response.data.error) {
-        errorMessage = err.response.data.error;
+      } else if (err.response && err.response.data && (err.response.data.error || err.response.data.detail)) {
+        errorMessage = err.response.data.error || err.response.data.detail;
+      } else if (err.code === 'ECONNABORTED') {
+        errorMessage = '요청 시간이 초과되었습니다. 대용량 파일의 경우 처리 시간이 더 필요할 수 있습니다.';
+      } else if (err.message) {
+        errorMessage = err.message;
       }
       
       setError(errorMessage);
@@ -198,7 +216,7 @@ function FileGroupManager({ files, onClearFiles, selectedTheme }) {
   if (groups.length === 0 && files.length === 0) return null;
 
   return (
-    <div style={{ marginTop: '30px', position: 'relative' }}>
+    <div className="manager-container">
       {isLoading && (
         <ProgressOverlay 
           theme={selectedTheme}
@@ -207,65 +225,53 @@ function FileGroupManager({ files, onClearFiles, selectedTheme }) {
           message={statusMessage} 
         />
       )}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '20px' }}>
+      <div className="manager-actions">
         <button 
           onClick={addGroup}
-          style={{ 
-            display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px',
-
-            backgroundColor: '#e3f2fd', color: '#1976d2', border: 'none', borderRadius: '6px',
-            cursor: 'pointer', fontWeight: '600'
-          }}
+          className="btn-add-group"
         >
           <Plus size={18} /> 그룹 추가
         </button>
       </div>
       
       {groups.map((group, index) => (
-        <div key={group.id} style={{
-          border: '1px solid #e0e0e0',
-          borderRadius: '12px',
-          padding: '24px',
-          marginBottom: '24px',
-          backgroundColor: '#ffffff',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.02)'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-            <h4 style={{ margin: 0, color: '#424242' }}>그룹 {index + 1}</h4>
-            <span style={{ fontSize: '13px', color: '#757575' }}>{group.files.length}개 파일 포함됨</span>
+        <div key={group.id} className="group-card">
+          <div className="group-header">
+            <h4>그룹 {index + 1}</h4>
+            <span className="group-file-count">{group.files.length}개 파일 포함됨</span>
           </div>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '20px' }}>
+          <div className="group-fields">
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#616161' }}>저장될 파일명</label>
+              <label className="field-label">저장될 파일명</label>
               <input 
                 type="text" 
                 value={group.filename}
                 onChange={(e) => handleGroupChange(group.id, 'filename', e.target.value)}
                 onFocus={handleFocus}
-                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #bdbdbd', outline: 'none' }}
+                className="field-input"
                 placeholder="예: AI수업_요약본"
               />
             </div>
             
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#616161' }}>문서 내부 &lt;제목&gt;</label>
+              <label className="field-label">문서 내부 &lt;제목&gt;</label>
               <input 
                 type="text" 
                 value={group.documentTitle}
                 onChange={(e) => handleGroupChange(group.id, 'documentTitle', e.target.value)}
                 onFocus={handleFocus}
-                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #bdbdbd', outline: 'none' }}
+                className="field-input"
                 placeholder="문서 상단에 표시될 제목"
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600', color: '#616161' }}>이미지 크기</label>
+              <label className="field-label">이미지 크기</label>
               <select 
                 value={group.imageSize}
                 onChange={(e) => handleGroupChange(group.id, 'imageSize', e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #bdbdbd', outline: 'none', backgroundColor: '#fff' }}
+                className="field-select"
               >
                 <option value="standard">표준 (110mm)</option>
                 <option value="original">원본 최대 (160mm)</option>
@@ -273,19 +279,16 @@ function FileGroupManager({ files, onClearFiles, selectedTheme }) {
             </div>
           </div>
           
-          <div style={{ backgroundColor: '#f5f5f5', borderRadius: '8px', padding: '12px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', fontWeight: '600', color: '#757575' }}>파일 리스트</label>
-            <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+          <div className="file-list-container">
+            <label className="file-list-label">파일 리스트</label>
+            <ul className="file-list">
               {group.files.length === 0 ? (
-                <li style={{ fontSize: '13px', color: '#9e9e9e', fontStyle: 'italic' }}>파일을 이곳으로 드래그하거나 선택하세요.</li>
+                <li className="file-list-empty">파일을 이곳으로 드래그하거나 선택하세요.</li>
               ) : (
                 group.files.map((file, i) => (
-                  <li key={i} style={{ 
-                    display: 'flex', justifyContent: 'space-between', padding: '6px 0', 
-                    fontSize: '13px', color: '#424242', borderBottom: i === group.files.length - 1 ? 'none' : '1px solid #eeeeee' 
-                  }}>
+                  <li key={i} className="file-item">
                     <span>{file.name}</span>
-                    <span style={{ color: '#9e9e9e' }}>{(file.size / 1024 / 1024).toFixed(1)}MB</span>
+                    <span className="file-size">{(file.size / 1024 / 1024).toFixed(1)}MB</span>
                   </li>
                 ))
               )}
@@ -295,44 +298,28 @@ function FileGroupManager({ files, onClearFiles, selectedTheme }) {
       ))}
 
       {error && (
-        <div style={{ padding: '14px', backgroundColor: '#ffebee', color: '#d32f2f', borderRadius: '8px', marginBottom: '20px', fontSize: '14px' }}>
+        <div className="error-message">
           {error}
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end', position: 'sticky', bottom: '20px' }}>
+      <div className="sticky-actions">
         <button 
           onClick={onClearFiles}
           disabled={isLoading}
-          style={{ 
-            padding: '12px 24px', borderRadius: '8px', border: '1px solid #e0e0e0', 
-            backgroundColor: '#ffffff', cursor: isLoading ? 'not-allowed' : 'pointer',
-            display: 'flex', alignItems: 'center', gap: '10px', color: '#424242', fontWeight: '600'
-          }}
+          className="btn-clear"
         >
           <Trash2 size={18} /> 전체 초기화
         </button>
         <button 
           onClick={handleConvert}
           disabled={isLoading || groups.length === 0}
-          style={{ 
-            padding: '12px 32px', borderRadius: '8px', border: 'none', 
-            backgroundColor: isLoading ? '#bbdefb' : '#1976d2', color: '#ffffff', 
-            fontWeight: 'bold', cursor: isLoading ? 'not-allowed' : 'pointer',
-            display: 'flex', alignItems: 'center', gap: '10px', boxShadow: '0 4px 12px rgba(25, 118, 210, 0.3)'
-          }}
+          className="btn-convert"
         >
-          {isLoading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <Download size={18} />} 
+          {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />} 
           {isLoading ? '문서 변환 중...' : '변환 및 다운로드 시작'}
         </button>
       </div>
-      
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </div>
   );
 }

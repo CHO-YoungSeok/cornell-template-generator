@@ -26,23 +26,18 @@ function FileUploader({ onFilesAdded }) {
   return (
     <div
       {...getRootProps()}
-      style={{
-        border: `2px dashed ${isDragActive ? '#2196f3' : '#cccccc'}`,
-        borderRadius: '8px',
-        padding: '40px',
-        textAlign: 'center',
-        cursor: 'pointer',
-        backgroundColor: isDragActive ? '#e3f2fd' : '#fafafa',
-        transition: 'all 0.3s ease',
-        marginBottom: '20px'
-      }}
+      className={`uploader-container ${isDragActive ? 'active' : 'idle'}`}
     >
       <input {...getInputProps()} />
-      <Upload size={48} color={isDragActive ? '#2196f3' : '#999'} style={{ marginBottom: '16px', display: 'inline-block' }} />
+      <Upload 
+        size={48} 
+        color={isDragActive ? '#2196f3' : '#999'} 
+        className="uploader-icon"
+      />
       {isDragActive ? (
-        <p style={{ margin: 0, color: '#2196f3', fontWeight: 'bold' }}>여기에 파일을 놓으세요...</p>
+        <p className="uploader-text active">여기에 파일을 놓으세요...</p>
       ) : (
-        <p style={{ margin: 0, color: '#666' }}>
+        <p className="uploader-text idle">
           PDF 또는 PPTX 파일을 드래그 앤 드롭 하거나,<br />
           클릭하여 파일을 선택하세요.
         </p>

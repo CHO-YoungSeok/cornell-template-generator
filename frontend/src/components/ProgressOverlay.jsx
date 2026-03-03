@@ -37,24 +37,34 @@ export const THEMES = {
  * param: message - 현재 단계의 상세 메시지
  * return: JSX 요소
  */
-const ProgressOverlay = ({ theme = 'genius', day, progress, message }) => {
+const ProgressOverlay = ({ theme = 'genesis', day, progress, message }) => {
   const [isVisible, setIsVisible] = useState(false);
   const canvasRef = useRef(null);
 
   useEffect(() => {
     setIsVisible(true);
-    return () => setIsVisible(false);
+    return () => {
+      setIsVisible(false);
+    };
   }, []);
 
   // 거북이 드로잉 애니메이션 로직
   useEffect(() => {
+    // 테마가 'genius'가 아니거나 캔버스가 없으면 애니메이션 실행 안 함
     if (theme !== 'genius' || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
     let animationFrameId;
     let time = 0;
 
+    /**
+     * 내용: 캔버스에 공부하는 거북이 캐릭터를 그립니다.
+     * param: 없음:
+     * return: 없음:
+     */
     const drawTurtle = () => {
       // 캔버스 초기화
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -183,7 +193,9 @@ const ProgressOverlay = ({ theme = 'genius', day, progress, message }) => {
     drawTurtle();
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
     };
   }, [theme, progress]);
 

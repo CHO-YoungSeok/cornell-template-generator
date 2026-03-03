@@ -117,6 +117,11 @@
   gap: 20px;
 }
 
+/* 호버 시 주변 항목 투명도 조절로 강조 효과 극대화 */
+.structure-desc:hover .desc-item:not(:hover) {
+  opacity: 0.5;
+}
+
 .desc-item {
   display: flex;
   align-items: flex-start;
@@ -125,16 +130,27 @@
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-  transition: transform 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  border-left: 4px solid transparent;
 }
 
-.desc-item:hover {
-  transform: translateX(10px);
+.desc-item.active, .desc-item:hover {
+  transform: translateX(10px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  border-left-color: #1976d2;
 }
 
 .landing-info-container.genesis-theme .desc-item {
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255,255,255,0.05);
+  border-left: 4px solid transparent;
+}
+
+.landing-info-container.genesis-theme .desc-item.active,
+.landing-info-container.genesis-theme .desc-item:hover {
+  border-left-color: #ffd700;
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.15);
 }
 
 .desc-number {

@@ -1,13 +1,14 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { BookOpen, BrainCircuit, Zap, ArrowRight, FileType, Image as ImageIcon, LayoutTemplate, Target } from 'lucide-react';
 import './LandingInfo.css';
 
 /**
  * 내용: 코넬 노트의 4분할 구조를 애니메이션으로 보여주는 캔버스 컴포넌트입니다.
  * param: theme - 현재 선택된 앱 테마
+ * param: forceSection - 마우스 호버 시 강제로 하이라이트할 섹션 인덱스 (0~3)
  * return: JSX 요소
  */
-const CornellCanvas = ({ theme }) => {
+const CornellCanvas = ({ theme, forceSection = null }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -50,7 +51,8 @@ const CornellCanvas = ({ theme }) => {
       ctx.beginPath(); ctx.moveTo(20, 400); ctx.lineTo(380, 400); ctx.stroke();
 
       // Cycle through 4 sections for highlighting
-      const cycle = Math.floor(time / 150) % 4;
+      // forceSection이 있으면 해당 섹션 고정, 없으면 시간 기반 자동 순환
+      const cycle = forceSection !== null ? forceSection : Math.floor(time / 150) % 4;
 
       ctx.fillStyle = highlightColor;
       if (cycle === 0) {
@@ -112,7 +114,10 @@ const CornellCanvas = ({ theme }) => {
       ctx.beginPath(); ctx.moveTo(35, 450); ctx.lineTo(350, 450); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(35, 470); ctx.lineTo(280, 470); ctx.stroke();
 
-      time++;
+      // forceSection이 없을 때만 시간을 흐르게 함 (호버 시 애니메이션 일시정지)
+      if (forceSection === null) {
+        time++;
+      }
       animationFrameId = requestAnimationFrame(draw);
     };
 
@@ -121,7 +126,7 @@ const CornellCanvas = ({ theme }) => {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [theme]);
+  }, [theme, forceSection]);
 
   return <canvas ref={canvasRef} width={400} height={500} className="cornell-canvas" />;
 };
@@ -132,6 +137,8 @@ const CornellCanvas = ({ theme }) => {
  * return: JSX 요소
  */
 const LandingInfo = ({ theme }) => {
+  const [hoveredSection, setHoveredSection] = useState(null);
+
   return (
     <div className={`landing-info-container ${theme}-theme`}>
       
@@ -144,31 +151,47 @@ const LandingInfo = ({ theme }) => {
 
         <div className="split-layout">
           <div className="canvas-wrapper">
-            <CornellCanvas theme={theme} />
+            <CornellCanvas theme={theme} forceSection={hoveredSection} />
           </div>
           <div className="structure-desc">
-            <div className="desc-item">
+            <div 
+              className={`desc-item ${hoveredSection === 0 ? 'active' : ''}`}
+              onMouseEnter={() => setHoveredSection(0)}
+              onMouseLeave={() => setHoveredSection(null)}
+            >
               <div className="desc-number">1</div>
               <div className="desc-text">
                 <h3>제목 (Title)</h3>
                 <p>오늘 배울 내용의 <strong>Context(맥락)를 가장 먼저 파악</strong>합니다. 숲을 먼저 보고 나무를 보는 학습의 시작입니다.</p>
               </div>
             </div>
-            <div className="desc-item">
+            <div 
+              className={`desc-item ${hoveredSection === 1 ? 'active' : ''}`}
+              onMouseEnter={() => setHoveredSection(1)}
+              onMouseLeave={() => setHoveredSection(null)}
+            >
               <div className="desc-number">2</div>
               <div className="desc-text">
                 <h3>단서 (Cue)</h3>
                 <p>좌측 단서만 보고 우측의 내용을 떠올리는 <strong>능동적 회상(Active Recall)</strong>을 훈련합니다. 핵심 키워드나 질문을 적어두세요.</p>
               </div>
             </div>
-            <div className="desc-item">
+            <div 
+              className={`desc-item ${hoveredSection === 2 ? 'active' : ''}`}
+              onMouseEnter={() => setHoveredSection(2)}
+              onMouseLeave={() => setHoveredSection(null)}
+            >
               <div className="desc-number">3</div>
               <div className="desc-text">
                 <h3>세부 내용 (Notes)</h3>
                 <p>강의나 자료의 디테일을 기록합니다. 좌측의 단서를 바탕으로 회상한 후, <strong>내가 정확하게 이해했는지 점검(메타인지)</strong>하는 기준이 됩니다.</p>
               </div>
             </div>
-            <div className="desc-item">
+            <div 
+              className={`desc-item ${hoveredSection === 3 ? 'active' : ''}`}
+              onMouseEnter={() => setHoveredSection(3)}
+              onMouseLeave={() => setHoveredSection(null)}
+            >
               <div className="desc-number">4</div>
               <div className="desc-text">
                 <h3>요약 (Summary)</h3>

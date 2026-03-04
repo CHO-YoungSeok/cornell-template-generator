@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000'; // FastAPI 기본 포트
+const API_BASE_URL = import.meta.env.DEV ? 'http://localhost:8000' : ''; // 개발 환경은 8000번, 배포(빌드) 환경은 동일 오리진 사용
 
 /**
  * 내용: 업로드된 파일 그룹 정보를 백엔드 API에 전달하여 변환을 요청합니다.

@@ -45,12 +45,12 @@
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r backend/requirements.txt
-cd backend && uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+python3 backend/main.py
 
 # ⚛️ Frontend: 인터페이스 소환
 cd frontend
 npm install
-npm run dev
+npm run build
 ```
 
 ---

@@ -1,0 +1,40 @@
+/* FileUploader Styles */
+.uploader-container {
+  border-radius: 8px;
+  padding: 40px;
+  text-align: center; /* 오타 수정: textAlign -> text-align */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+  border-width: 2px;
+  border-style: dashed;
+}
+
+.uploader-container.idle {
+  border-color: #cccccc;
+  background-color: #fafafa;
+}
+
+.uploader-container.active {
+  border-color: #2196f3;
+  background-color: #e3f2fd;
+}
+
+.uploader-icon {
+  margin-bottom: 16px;
+  display: inline-block;
+}
+
+.uploader-text {
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+.uploader-text.idle {
+  color: #666;
+}
+
+.uploader-text.active {
+  color: #2196f3;
+  font-weight: bold;
+}

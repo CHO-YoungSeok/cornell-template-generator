@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload } from 'lucide-react';
+import './FileUploader.css';
 
 /**
  * 내용: 파일 드래그 앤 드롭 업로더 컴포넌트입니다. PDF와 PPTX 파일만 허용합니다.

@@ -1,0 +1,106 @@
+/* 
+  내용: MainPage 전용 레이아웃 및 테마 스타일 시트
+  기능: 전체 중앙 정렬, 상단 고정 테마 선택 바, 테마별 색상 전환 지원
+*/
+
+.app-container {
+  min-height: 100vh;
+  width: 100%;
+  transition: background-color 0.5s ease, color 0.5s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 5rem;
+}
+
+/* --- 테마별 배경색 및 폰트색 정의 --- */
+
+/* Genesis: 창조 테마 (어두운 배경, 금빛 포인트) */
+.genesis-theme {
+  background-color: #0f172a;
+  color: #f8fafc;
+}
+
+/* Genius: 천재 테마 (밝은 배경, 파란 포인트) */
+.genius-theme {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+/* --- 상단 테마 선택기 레이아웃 --- */
+.theme-selector-container {
+  position: fixed;
+  top: 1.5rem;
+  left: 1.5rem;
+  z-index: 100;
+}
+
+.theme-select {
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  color: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.2s;
+}
+
+.theme-select:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.genesis-theme .theme-select {
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.genius-theme .theme-select {
+  border-color: rgba(30, 118, 210, 0.2);
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #1e293b;
+}
+
+/* --- 메인 콘텐츠 영역 --- */
+.app-content {
+  width: 100%;
+  max-width: 800px;
+  margin-top: 6rem;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.app-header {
+  text-align: center;
+}
+
+.app-header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.025em;
+}
+
+.app-header p {
+  font-size: 1.125rem;
+  opacity: 0.8;
+}
+
+main {
+  width: 100%;
+}
+
+/* 반응형 처리 */
+@media (max-width: 640px) {
+  .app-header h1 {
+    font-size: 1.875rem;
+  }
+  
+  .theme-selector-container {
+    position: static;
+    margin: 1rem 0 -4rem 1.5rem;
+  }
+}
